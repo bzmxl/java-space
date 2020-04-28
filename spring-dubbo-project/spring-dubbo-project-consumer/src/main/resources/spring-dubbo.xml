@@ -23,4 +23,8 @@
     <dubbo:reference interface="com.bzmxl.dubbo.common.provider.api.ProviderService" id="providerService"
                      group="${config.dubbo.provider.group}" version="${config.dubbo.provider.version}" check="false"
                      timeout="8000"/>
+
+    <dubbo:reference interface="com.bzmxl.dubbo.common.provider.api.ProviderAsyncService" id="providerAsyncService"
+                     group="${config.dubbo.provider.group}" version="${config.dubbo.provider.version}" check="false"
+                     timeout="80000"/>
 </beans>
