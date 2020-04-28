@@ -19,6 +19,8 @@
     <!-- 和本地bean一样实现服务 -->
     <bean id="consumerService" class="com.bzmxl.dubbo.consumer.service.impl.dubbo.ConsumerServiceImpl"/>
 
+    <bean id="notifyImpl" class="com.bzmxl.dubbo.consumer.service.impl.NotifyImpl"/>
+
     <!-- dubbo消费服务-->
     <dubbo:reference interface="com.bzmxl.dubbo.common.provider.api.ProviderService" id="providerService"
                      group="${config.dubbo.provider.group}" version="${config.dubbo.provider.version}" check="false"
@@ -27,4 +29,11 @@
     <dubbo:reference interface="com.bzmxl.dubbo.common.provider.api.ProviderAsyncService" id="providerAsyncService"
                      group="${config.dubbo.provider.group}" version="${config.dubbo.provider.version}" check="false"
                      timeout="80000"/>
+
+    <dubbo:reference interface="com.bzmxl.dubbo.common.provider.api.ProviderCallbackService"
+                     id="providerCallbackService"
+                     group="${config.dubbo.provider.group}" version="${config.dubbo.provider.version}" check="false"
+                     timeout="80000">
+        <dubbo:method name="get" async="true" onreturn="notifyImpl.onreturn" onthrow="notifyImpl.onthrow"/>
+    </dubbo:reference>
 </beans>

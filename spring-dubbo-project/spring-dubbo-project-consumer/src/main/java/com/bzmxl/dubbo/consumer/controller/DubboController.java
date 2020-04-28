@@ -1,10 +1,12 @@
 package com.bzmxl.dubbo.consumer.controller;
 
 import com.bzmxl.dubbo.common.provider.api.ProviderAsyncService;
+import com.bzmxl.dubbo.common.provider.api.ProviderCallbackService;
 import com.bzmxl.dubbo.common.provider.api.ProviderService;
 import com.bzmxl.dubbo.common.provider.domain.ProviderMid;
 import com.bzmxl.dubbo.common.provider.domain.ProviderReq;
 import com.bzmxl.dubbo.common.provider.domain.ProviderRsp;
+import com.bzmxl.dubbo.consumer.service.impl.NotifyImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.rpc.RpcContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 @Slf4j
 @RestController
@@ -25,6 +29,12 @@ public class DubboController {
 
     @Autowired
     private ProviderAsyncService providerAsyncService;
+
+    @Autowired
+    private ProviderCallbackService providerCallbackService;
+
+    @Autowired
+    private NotifyImpl notify;
 
     @GetMapping("/a")
     public ProviderRsp a() {
@@ -77,5 +87,37 @@ public class DubboController {
         });
         log.info("sync/b end " + System.currentTimeMillis());
         return "sync b";
+    }
+
+    @GetMapping("/sync/c")
+    public String sync_c() {
+        String result = null;
+        providerAsyncService.sayHello("world");
+        Future<String> future = RpcContext.getContext().getFuture();
+        try {
+            result = future.get();
+        } catch (InterruptedException | ExecutionException e) {
+
+        }
+        return "sync c=======" + result;
+    }
+
+    @GetMapping("/callback")
+    public int callback() {
+        int count = providerCallbackService.get(6);
+        log.info("=====count====" + count);
+        //for Test：只是用来说明callback正常被调用，业务具体实现自行决定.
+        for (int i = 0; i < 10; i++) {
+            if (!notify.ret.containsKey(6)) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+
+                }
+            } else {
+                break;
+            }
+        }
+        return notify.ret.get(6);
     }
 }
