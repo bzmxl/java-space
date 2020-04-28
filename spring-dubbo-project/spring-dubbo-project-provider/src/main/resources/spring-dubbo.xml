@@ -10,7 +10,8 @@
 
     <dubbo:registry id="registry" address="${config.dubbo.registry.address}"/>
 
-    <dubbo:protocol name="dubbo" host="0.0.0.0" port="${config.dubbo.port}"/>
+    <dubbo:protocol name="dubbo" host="0.0.0.0" port="${config.dubbo.port}" serialization="kryo"
+                    optimizer="com.bzmxl.dubbo.common.serialization.SerializationOptimizerImpl"/>
 
     <!-- 声明需要暴露的服务接口 -->
     <dubbo:service interface="com.bzmxl.dubbo.common.provider.api.ProviderService" ref="providerService"
