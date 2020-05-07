@@ -15,4 +15,6 @@ public class KafKaConfiguration {
     private int topicPartitions;
     @Value("${kafka.topic.replicas}")
     private short topicReplicas;
+    @Value("${kafka.client.id}")
+    private String clientId;
 }

@@ -1,48 +1,47 @@
-package com.bzmxl.kafka.provider.service.impl;
+package com.bzmxl.kafka.provider.tasks;
 
 import com.bzmxl.kafka.provider.config.KafKaConfiguration;
 import com.bzmxl.kafka.provider.domain.KafkaMsg;
-import com.bzmxl.kafka.provider.service.KafkaService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
-import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 @Slf4j
-@Service
-public class KafkaServiceImpl implements KafkaService {
+@Component
+public class KafkaAsyncTask {
+    //使用线程池的方式发送任务
+    //生产者线程安全，消费者线程不安全
     @Autowired
     private KafkaTemplate<String, KafkaMsg> kafkaTemplate;
 
     @Autowired
     private KafKaConfiguration kafKaConfiguration;
 
-    @Override
-    public void sendAsync(KafkaMsg kafkaMsg) {
+    @Async("CallerRunsPolicy")
+    public void send(final KafkaMsg kafkaMsg) {
+        log.info("============" + Thread.currentThread().getId());
+        //没有key，使用轮询
         final ProducerRecord<String, KafkaMsg> record = new ProducerRecord<>(kafKaConfiguration.getTopicName(), kafkaMsg);
         ListenableFuture<SendResult<String, KafkaMsg>> future = kafkaTemplate.send(record);
         future.addCallback(new ListenableFutureCallback<SendResult<String, KafkaMsg>>() {
             @Override
             public void onSuccess(SendResult<String, KafkaMsg> stringKafkaMsgSendResult) {
-                handleSuccess(stringKafkaMsgSendResult.getProducerRecord().value());
+                log.info("========handleSuccess=========" + stringKafkaMsgSendResult.getRecordMetadata().offset());
+                log.info("========handleSuccess=========" + stringKafkaMsgSendResult.getProducerRecord().value());
             }
 
             @Override
             public void onFailure(Throwable throwable) {
-                handleFailure(throwable);
+                //保存在数据库表中，下次处理/或者重发
+                log.error("======handleFailure======={}" + throwable.getMessage());
+                log.info("=====handleFailure=====" + kafkaMsg);
             }
         });
-    }
-
-    private void handleSuccess(KafkaMsg kafkaMsg) {
-        log.info("======handleSuccess=======" + kafkaMsg);
-    }
-
-    private void handleFailure(Throwable throwable) {
-        log.info("======handleFailure======={}" + throwable.getMessage());
     }
 }

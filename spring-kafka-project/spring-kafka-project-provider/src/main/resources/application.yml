@@ -5,5 +5,7 @@ kafka:
     name: bzmxl
     partitions: 1
     replicas: 1
+  client:
+    id: bzmxl-provider
 server:
   port: 9872

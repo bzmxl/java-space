@@ -25,6 +25,8 @@ public class KafKaConfig {
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafKaConfiguration.getBootstrapServers());
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        configProps.put(ProducerConfig.CLIENT_ID_CONFIG, kafKaConfiguration.getClientId());
+        configProps.put(ProducerConfig.RETRIES_CONFIG, "0");
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
