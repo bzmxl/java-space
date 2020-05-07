@@ -1,0 +1,11 @@
+kafka:
+  bootstrap:
+    servers: 127.0.0.1:9092
+  topic:
+    name: bzmxl
+    partitions: 1
+    replicas: 1
+  group:
+    id: kafka-group
+server:
+  port: 9873
