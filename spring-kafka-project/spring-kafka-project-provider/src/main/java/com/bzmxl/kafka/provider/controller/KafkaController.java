@@ -1,5 +1,6 @@
 package com.bzmxl.kafka.provider.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.bzmxl.kafka.provider.domain.KafkaMsg;
 import com.bzmxl.kafka.provider.tasks.KafkaAsyncTask;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ public class KafkaController {
         String msg = "" + System.currentTimeMillis();
         kafkaMsg.setMsgId(msg);
         kafkaMsg.setMsg("msg " + msg);
-        kafkaAsyncTask.send(kafkaMsg);
+        kafkaAsyncTask.send(JSON.toJSONString(kafkaMsg));
         return kafkaMsg;
     }
 }

@@ -1,11 +1,19 @@
 kafka:
+  auto:
+    offset:
+      reset: earliest
   bootstrap:
     servers: 127.0.0.1:9092
+  enable:
+    auto:
+      commit: false
+  group:
+    id: bzmxl-group
   topic:
     name: bzmxl
     partitions: 1
     replicas: 1
-  group:
-    id: kafka-group
+  client:
+    id: bzmxl-consumer
 server:
   port: 9873

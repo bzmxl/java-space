@@ -1,7 +1,6 @@
 package com.bzmxl.kafka.provider.tasks;
 
 import com.bzmxl.kafka.provider.config.KafKaConfiguration;
-import com.bzmxl.kafka.provider.domain.KafkaMsg;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,20 +17,20 @@ public class KafkaAsyncTask {
     //使用线程池的方式发送任务
     //生产者线程安全，消费者线程不安全
     @Autowired
-    private KafkaTemplate<String, KafkaMsg> kafkaTemplate;
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Autowired
     private KafKaConfiguration kafKaConfiguration;
 
     @Async("CallerRunsPolicy")
-    public void send(final KafkaMsg kafkaMsg) {
+    public void send(final String msg) {
         log.info("============" + Thread.currentThread().getId());
         //没有key，使用轮询
-        final ProducerRecord<String, KafkaMsg> record = new ProducerRecord<>(kafKaConfiguration.getTopicName(), kafkaMsg);
-        ListenableFuture<SendResult<String, KafkaMsg>> future = kafkaTemplate.send(record);
-        future.addCallback(new ListenableFutureCallback<SendResult<String, KafkaMsg>>() {
+        final ProducerRecord<String, String> record = new ProducerRecord<>(kafKaConfiguration.getTopicName(), msg);
+        ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(record);
+        future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
             @Override
-            public void onSuccess(SendResult<String, KafkaMsg> stringKafkaMsgSendResult) {
+            public void onSuccess(SendResult<String, String> stringKafkaMsgSendResult) {
                 log.info("========handleSuccess=========" + stringKafkaMsgSendResult.getRecordMetadata().offset());
                 log.info("========handleSuccess=========" + stringKafkaMsgSendResult.getProducerRecord().value());
             }
@@ -39,8 +38,8 @@ public class KafkaAsyncTask {
             @Override
             public void onFailure(Throwable throwable) {
                 //保存在数据库表中，下次处理/或者重发
-                log.error("======handleFailure======={}" + throwable.getMessage());
-                log.info("=====handleFailure=====" + kafkaMsg);
+                log.error("======handleFailure======={}", throwable.getMessage());
+                log.info("=====handleFailure=====" + msg);
             }
         });
     }

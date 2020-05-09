@@ -17,4 +17,10 @@ public class KafKaConfiguration {
     private short topicReplicas;
     @Value("${kafka.group.id}")
     private String groupId;
+    @Value("${kafka.auto.offset.reset}")
+    private String offsetReset;
+    @Value("${kafka.enable.auto.commit}")
+    private String autoCommit;
+    @Value("${kafka.client.id}")
+    private String clientId;
 }
