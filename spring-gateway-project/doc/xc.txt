@@ -36,3 +36,19 @@ spring-kafka
 postgresql
 
 Docker
+
+zookeeper
+dubbo
+kryo
+easyexcel
+protobuf-java
+quartz
+xxl-job
+ffmpeg
+dingtalk
+spring-cloud-starter-netflix-eureka-client
+spring-cloud-starter-netflix-eureka-server
+spring-cloud-starter-netflix-zuul
+spring-cloud-config-server
+spring-boot-starter-data-mongodb
+
